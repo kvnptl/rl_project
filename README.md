@@ -1,8 +1,8 @@
 # Multimodal reinforcement learning for robotic pushing
 
-A simulated Franka Panda learns to push a YCB object across a table into a marked target. The project uses PyBullet and Stable Baselines3 Soft Actor-Critic (SAC) to compare visual observations, proprioception, explicit goal information, and reward design.
+A simulated Franka Panda learns to push objects into a target in PyBullet. The experiments use Soft Actor-Critic (SAC) to compare vision, robot state, goal information, and reward design.
 
-[Course paper](docs/coursework/report.pdf) · [Reproduction note](docs/reproduction.md) · [Original demo](results/videos/push_episode_1743126069_hard_multimodal.mp4) · [Cite this project](#citation)
+[Research and reproduction notes](docs/reproduction.md) · [Experiment results](results/) · [Demo video](results/videos/multimodal-hard-replay.mp4) · [Cite this project](#citation)
 
 ![A simulated Panda approaches and pushes a pudding box onto the green target](results/videos/multimodal-hard-replay.gif)
 
@@ -39,7 +39,7 @@ The policy receives numerical features from simulator segmentation and robot sta
 | `checkpoints/models_exp_08_*`, `checkpoints/models_exp_09_*` | Object-centric and robot-centric observations |
 | `checkpoints/models_exp_10_*`, `checkpoints/models_exp_11_*` | Varying target positions with and without explicit goal input |
 
-The course report found that multimodal observations performed better than either single modality. Explicit goal input and shaped rewards accelerated learning in the reported experiments. In a new three-episode replay per checkpoint, the goal-conditioned multimodal policy reached the target twice, the multimodal policy without goal input reached it once, and the single-modality policies timed out. [Archived curves](results/plots/) · [Replay protocol and results](docs/reproduction.md#checkpoint-replay)
+In the archived training runs, multimodal observations performed better than either single modality. Runs with explicit goal input and shaped rewards reached high success rates earlier. In a three-episode replay per checkpoint, the goal-conditioned multimodal policy reached the target twice, the multimodal policy without goal input reached it once, and the single-modality policies timed out. [Archived curves](results/plots/) · [Replay protocol and results](docs/reproduction.md#checkpoint-replay)
 
 ## Run it locally
 
@@ -63,7 +63,7 @@ The recording command works headlessly. Add `--render` to open the simulator win
 
 ```bash
 mkdir -p outputs/demo
-python scripts/course/agent_training.py \
+python scripts/reference/agent_training.py \
   --run-episode --record --seed 36 --randomize-spawn \
   --difficulty-level 3 --max-steps 150 --observation-type multimodal --trust-checkpoint \
   --load-model checkpoints/models_exp_05_multimodal/interrupted_model_sac_20250327_083255.zip \
@@ -72,10 +72,10 @@ python scripts/course/agent_training.py \
 
 ### Train from scratch
 
-This small run exercises environment setup, training, and model export. It is intended as a smoke test. The course experiments trained on the order of millions of timesteps.
+This smoke test exercises environment setup, training, and model export. The archived experiments ran for millions of timesteps.
 
 ```bash
-python scripts/course/agent_training.py \
+python scripts/reference/agent_training.py \
   --total-timesteps 64 --learning-starts 32 --buffer-size 1024 \
   --batch-size 32 --max-steps 100 --n-eval-episodes 1 --seed 42 \
   --observation-type multimodal --model-dir outputs/demo/models \
@@ -86,14 +86,14 @@ python scripts/course/agent_training.py \
 
 | Path | Purpose |
 | --- | --- |
-| [scripts/course/](scripts/course/) | Submitted simulator, trainer, and course training command |
+| [scripts/reference/](scripts/reference/) | Reference simulator, trainer, and full training command |
 | [scripts/launchers/](scripts/launchers/) | Shell commands for training, evaluation, and checkpoint sweeps |
 | [scripts/](scripts/) | Experiment variants, evaluation, plotting, and prototypes |
 | [config/train/](config/train/) | YAML configuration for staged training |
 | [config/archive/](config/archive/) | Historical run snapshots, including paths from the original system |
 | [checkpoints/](checkpoints/) | Released model archives, grouped by experiment |
 | [results/](results/) | Archived metrics, plots, and [recorded rollouts](results/videos/) |
-| [docs/coursework/](docs/coursework/) | Course report, proposal, assignment, and figures |
+| [docs/](docs/) | Research and reproduction notes, workspace figures, and segmentation examples |
 
 Generated recordings go to `outputs/videos/` unless you pass `--video-path`. To regenerate the goal-conditioning plot from the archived CSVs, run `python scripts/plot_results.py`. It writes to `outputs/plots/`.
 
@@ -102,8 +102,6 @@ Generated recordings go to `outputs/videos/` unless you pass `--video-path`. To 
 | Previous path | Current path |
 | --- | --- |
 | Root `run_*.sh` scripts | `scripts/launchers/run_*.sh` |
-| `Patel_ROLE_project/code_directory/` | `scripts/course/` |
-| `Patel_ROLE_project/Patel_ROLE_project_report.pdf` | `docs/coursework/report.pdf` |
 | Root `models_*/` folders | `checkpoints/models_*/` |
 | `videos/` | `results/videos/` |
 

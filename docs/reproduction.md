@@ -1,16 +1,16 @@
 # Reproducing the robotic pushing experiments
 
-The original course paper compares observation inputs and reward functions for a Franka Panda trained with Soft Actor-Critic in PyBullet. We replayed four released checkpoints under a shared protocol. Both multimodal policies reached the goal, while the two single-modality policies timed out in all three trials. [Course paper](coursework/report.pdf)
+This project compares observation inputs and reward functions for a Franka Panda trained with Soft Actor-Critic in PyBullet. We replayed four released checkpoints under a shared protocol. Both multimodal policies reached the goal, while the two single-modality policies timed out in all three trials. [Archived experiments](../results/)
 
 ## Task and method
 
 A frontal camera provides simulator segmentation masks. The policy receives the object's normalized image bounding box, optional target coordinates, and optional Cartesian end-effector position and velocity. During occlusion the environment retains the last detected box. The SAC actor outputs a planar displacement. The simulator applies smoothing, inverse kinematics, and joint position control at a fixed pushing height. One policy action advances ten simulation steps.
 
-The five-level curriculum widens the spawn range around the tabletop. The paper's progression rule uses the trailing 50 episodes and an 80% success threshold. The shaped reward combines reaching the goal, approaching the object, moving it toward the goal, and penalties for elapsed time and occlusion. The sparse variant retains goal completion and a time penalty. The reported baseline uses a fixed target, so a policy can learn a useful pushing direction without receiving explicit target coordinates.
+The five-level curriculum widens the spawn range around the tabletop. The reference trainer's progression rule uses the trailing 50 episodes and an 80% success threshold. The shaped reward combines reaching the goal, approaching the object, moving it toward the goal, and penalties for elapsed time and occlusion. The sparse variant retains goal completion and a time penalty. The baseline uses a fixed target, so a policy can learn a useful pushing direction without receiving explicit target coordinates. [Reference trainer](../scripts/reference/agent_training.py)
 
 ## Archived training comparisons
 
-The original experiments measure the fraction of episodes where the object reaches the target. Across the reported runs, multimodal observations learned a stronger pushing policy than vision or proprioception alone. The paper estimates convergence around 1.1 million steps with explicit target coordinates and around 1.4 million without them. Shaped rewards accelerated initial learning relative to sparse rewards. Figure 5 shows a successful 48-step hard-difficulty episode.
+The archived experiments measure the fraction of episodes where the object reaches the target. Both multimodal runs reached 100% on the logged metric, while the vision-only and proprioception-only runs peaked at 8% and 51%, respectively. The goal-conditioned run first logged 100% at about 0.99 million steps and the multimodal run without goal input did so at about 1.15 million steps. The sparse-reward run reached that mark at about 1.13 million steps. These are first recorded hits in individual training curves. [Raw metric exports](../results/)
 
 ![Archived training curves comparing observation modes](../results/plots/step_vs_success_rate_plot.png)
 
@@ -29,7 +29,7 @@ We evaluated the four checkpoint filenames from the archived sweep on CPU with P
 | Vision, proprioception, and goal | 2/3 | 72.33 | 147.54 |
 | Vision and proprioception | 1/3 | 109.67 | 31.00 |
 
-The multimodal policy with goal input reached the target in 38 and 29 steps on its successful trials. Both single-modality policies hit the 150-step cap on every trial. The direction agrees with the course paper, with insufficient trials to estimate a reliable success rate. [Episode-level results](../results/replay_observation_modes.csv)
+The multimodal policy with goal input reached the target in 38 and 29 steps on its successful trials. Both single-modality policies hit the 150-step cap on every trial. The result agrees with the direction of the archived experiments. Three trials per policy give a limited estimate of success. [Episode-level results](../results/replay_observation_modes.csv)
 
 Run the following from the repository root after installing the dependencies and object models. Set `mode` and `checkpoint` for the desired run. [Setup instructions](../README.md#run-it-locally)
 
@@ -55,4 +55,4 @@ The video uses the experiment 05 multimodal checkpoint and seed 36 with a sample
 
 ## Limits
 
-The paper's reference to success above 100% is inconsistent with the CSVs, which top out at 100%. Its methodology describes a five-million-step training recipe and its evaluation section describes approximately two-million-step comparison runs. A fresh learning-curve reproduction would need the exact settings and stopping rule for each run, multiple independent seeds, and a stated convergence criterion. This replay covers a single object and a fixed target in simulation. The reward and varying-target checkpoints need their own replay protocols. The course paper leaves hardware transfer for future work.
+A fresh learning-curve reproduction would need the exact settings and stopping rule for each run, multiple independent seeds, and a stated convergence criterion. This replay covers a single object and a fixed target in simulation. The reward and varying-target checkpoints need their own replay protocols. Transfer to physical hardware remains future work.
