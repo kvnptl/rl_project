@@ -1,4 +1,4 @@
-# Multimodal reinforcement learning for robotic pushing
+# Multimodal Reinforcement Learning for Robotic Pushing
 
 A simulated Franka Panda learns to push objects into a target in PyBullet. The experiments use Soft Actor-Critic (SAC) to compare vision, robot state, goal information, and reward design.
 
